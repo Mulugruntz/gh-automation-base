@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "gh-automation-base"
+version = "0.1.0"
+description = "A project base for automating Python tasks using GitHub actions and Google tools."
+authors = ["Samuel Giffard <samuel@giffard.co>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "gh_automation_base"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+typer = "^0.9.0"
+
+[tool.poetry.scripts]
+auto = "gh_automation_base.cli:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
