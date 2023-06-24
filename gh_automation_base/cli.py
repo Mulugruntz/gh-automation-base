@@ -7,12 +7,12 @@ app = typer.Typer()
 
 
 @app.command()
-def hello(name: str):
+def hello(name: str) -> None:
     """Say hello to NAME"""
     typer.echo(f"Hello {name}")
 
 
-def main():
+def main() -> None:
     app()
 
 
