@@ -1,5 +1,5 @@
 """An example ETL pipeline that extracts quotes from an API and loads them to a database."""
-
+from dataclasses import dataclass
 from datetime import datetime
 from typing import cast, Any
 
@@ -19,7 +19,14 @@ class Quote(BaseModel):
     created_at: datetime | None = None
 
 
-class QuotesETL(AsyncETL[dict[str, Any], Quote, bool]):
+@dataclass(frozen=True)
+class Result:
+    success: bool
+    status: str
+    quote: Quote
+
+
+class QuotesETL(AsyncETL[dict[str, Any], Quote, Result]):
     async def _get_last_id(self) -> int:
         """
         Get the last ID from the database.
@@ -53,7 +60,7 @@ class QuotesETL(AsyncETL[dict[str, Any], Quote, bool]):
         """
         return Quote(**data)
 
-    async def load(self, data: Quote) -> bool:
+    async def load(self, data: Quote) -> Result:
         """
         Load the transformed data to the database.
         """
@@ -69,7 +76,11 @@ class QuotesETL(AsyncETL[dict[str, Any], Quote, bool]):
                 data.quote,
                 data.author,
             )
-            return True
+            return Result(success=True, status="Inserted", quote=data)
+        except asyncpg.exceptions.PostgresError as e:
+            return Result(success=False, status=str(e), quote=data)
+        except Exception as e:
+            return Result(success=False, status=str(e), quote=data)
         finally:
             await connection.close()
 
@@ -81,5 +92,11 @@ async def cmd_quotes(config: Config) -> None:
     etl = QuotesETL(config)
     data = await etl.extract()
     transformed_data = await etl.transform(data)
-    success = await etl.load(transformed_data)
-    typer.echo(f"Success: {success}")
+    result = await etl.load(transformed_data)
+    if result.success:
+        typer.echo(f"{result.status} quote {result.quote.id}: {result.quote.quote}")
+    else:
+        typer.echo(
+            f"Failed to load quote {result.quote.id}: {result.quote.quote}.", err=True
+        )
+        typer.echo(f"Error: {result.status}", err=True)
