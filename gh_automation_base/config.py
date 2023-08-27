@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
 
 ENV_PREFIX = "GH_AUTO_"
-
+SSLMode = Literal["require", "verify-ca", "verify-full", "prefer", "allow", "disable"]
 
 load_dotenv()
 
@@ -34,9 +34,9 @@ class PostgresConfig(BaseSettings):
     # Postgres port
     port: int
     # SSL mode
-    sslmode: Literal[
-        "require", "verify-ca", "verify-full", "prefer", "allow", "disable"
-    ] = Field(default="require")
+    sslmode: SSLMode = Field(default="require")
+    # Schema
+    db_schema: str = Field(default="gh_auto_schema")
     # Aiven config
     aiven: AivenConfig = Field(default_factory=AivenConfig)
 
@@ -52,6 +52,11 @@ class PostgresConfig(BaseSettings):
     def dsn(self) -> str:
         """Return the DSN for the database."""
         return f"postgresql://{self.user}:{self.password}@{self.host}:{self.port}/{self.database}?sslmode={self.sslmode}"
+
+    @property
+    def yoyo_dns(self) -> str:
+        """Return the DSN for the database (with the correct driver for Yoyo migration)."""
+        return f"postgresql+psycopg://{self.user}:{self.password}@{self.host}:{self.port}/{self.database}?sslmode={self.sslmode}"
 
 
 class Config(BaseSettings):
