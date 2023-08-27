@@ -12,15 +12,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Install poetry
+        run: pipx install poetry
+
       - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
           cache: 'poetry'
 
+      - name: Install dependencies
+        run: poetry install --without dev
+
       - name: Running
         run: |
-          poetry install --without dev
           poetry run auto quotes
         env:
           GH_AUTO_PG_AIVEN_PROJECT: ${{ secrets.GH_AUTO_PG_AIVEN_PROJECT }}
