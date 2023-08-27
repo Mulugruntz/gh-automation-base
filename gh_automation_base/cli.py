@@ -6,6 +6,7 @@ import asyncio
 
 from gh_automation_base.config import Config
 from gh_automation_base.persistence.init import cmd_init, cmd_clean
+from gh_automation_base.pipelines.quotes import cmd_quotes
 
 app = typer.Typer()
 
@@ -46,6 +47,13 @@ def clean() -> None:
     """Clean the database"""
     config = Config()
     asyncio.run(cmd_clean(config))
+
+
+@app.command()
+def quotes() -> None:
+    """Run the quotes pipeline"""
+    config = Config()
+    asyncio.run(cmd_quotes(config))
 
 
 def main() -> None:
