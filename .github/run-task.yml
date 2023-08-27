@@ -1,0 +1,27 @@
+name: Run Task
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/15 * * * *"  # Every 15 minutes.
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Running
+        run: |
+          make install
+          poetry run auto quotes
+        env:
+          GH_AUTO_PG_AIVEN_PROJECT: ${{ secrets.GH_AUTO_PG_AIVEN_PROJECT }}
+          GH_AUTO_PG_AIVEN_SERVICE: ${{ secrets.GH_AUTO_PG_AIVEN_SERVICE }}
+          GH_AUTO_PG_USER: ${{ secrets.GH_AUTO_PG_USER }}
+          GH_AUTO_PG_PASSWORD: ${{ secrets.GH_AUTO_PG_PASSWORD }}
+          GH_AUTO_PG_DATABASE: ${{ secrets.GH_AUTO_PG_DATABASE}}
+          GH_AUTO_PG_PORT: ${{ secrets.GH_AUTO_PG_PORT}}
