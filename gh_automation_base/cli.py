@@ -5,8 +5,6 @@ import asyncpg
 import asyncio
 
 from gh_automation_base.config import Config
-from gh_automation_base.persistence.init import cmd_init, cmd_clean
-from gh_automation_base.pipelines.quotes import cmd_quotes
 
 app = typer.Typer()
 
@@ -38,6 +36,8 @@ def dsn() -> None:
 @app.command()
 def init() -> None:
     """Initialize a new project"""
+    from gh_automation_base.persistence.init import cmd_init
+
     config = Config()
     asyncio.run(cmd_init(config))
 
@@ -45,6 +45,8 @@ def init() -> None:
 @app.command()
 def clean() -> None:
     """Clean the database"""
+    from gh_automation_base.persistence.init import cmd_clean
+
     config = Config()
     asyncio.run(cmd_clean(config))
 
@@ -52,6 +54,8 @@ def clean() -> None:
 @app.command()
 def quotes() -> None:
     """Run the quotes pipeline"""
+    from gh_automation_base.pipelines.quotes import cmd_quotes
+
     config = Config()
     asyncio.run(cmd_quotes(config))
 
