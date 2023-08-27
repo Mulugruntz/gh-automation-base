@@ -9,8 +9,7 @@ A project base for automating Python tasks using GitHub actions and an Aiven for
 
     ```bash
     pip install poetry
-    poetry install
-    poetry install -E dev
+    poetry install --all-extras
     ```
 
 5. Initialize the database using the following command:
